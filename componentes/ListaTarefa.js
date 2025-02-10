@@ -61,16 +61,16 @@ export default function ListaTarefas() {
           renderItem={({ item, index }) => (
             <View style={styles.taskCard}>
               <View style={styles.taskInfo}>
-                <Text style={styles.taskTitle}>Título: {item.title}</Text>
-                <Text style={styles.taskDescription}>Descrição: {item.description}</Text>
-                <Text style={styles.taskDate}>Data: {item.date}</Text>
+                <Text style={styles.taskTitle}>TITULO: {item.title}</Text>
+                <Text style={styles.taskDescription}>DESCRIÇÃO: {item.description}</Text>
+                <Text style={styles.taskDate}>DATA: {item.date}</Text>
               </View>
               <View style={styles.actions}>
                 <TouchableOpacity onPress={() => toggleCompletion(index)} style={styles.actionButton}>
                   <Ionicons
                     name={item.isCompleted ? "checkmark-circle" : "checkmark-circle-outline"}
                     size={30}
-                    color={item.isCompleted ? "green" : "gray"}
+                    color={item.isCompleted ? "green" : "#ffffff"}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => deleteTask(index)} style={styles.actionButton}>
@@ -114,10 +114,12 @@ const styles = StyleSheet.create({
   taskCard: {
     marginLeft: 10,
     marginRight: 10,
-    backgroundColor: "#ffffff",
+    backgroundColor: "rgba(255, 255, 255, 0.51)",
     padding: 15,
     marginVertical: 8,
     borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#ffffff",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
@@ -131,19 +133,21 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   taskTitle: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "bold",
     marginBottom: 4,
-    color: "#333",
+    color: "#ffffff",
   },
   taskDescription: {
-    fontSize: 14,
+    fontSize: 12,
+    fontWeight: "bold",
     marginBottom: 4,
-    color: "#666",
+    color: "#ffffff",
   },
   taskDate: {
     fontSize: 12,
-    color: "#888",
+    fontWeight: "bold",
+    color: "#ffffff",
   },
   actions: {
     flexDirection: "row",

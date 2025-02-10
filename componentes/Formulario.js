@@ -3,16 +3,45 @@ import { View, Text, TextInput, Button, Alert, StyleSheet, Pressable, ImageBackg
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
 
 export default function Formulario({ navigation }) {
-  const { control, handleSubmit, reset } = useForm();
+
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [tasks, setTasks] = useState([]);
 
-  useEffect(() => {
-    loadTasks();
-  }, []);
+  
+  useEffect(() => {loadTasks()}, []);
+
+
+  const taskSchema = z.object({
+    title: z.string().min(3, "O título deve ter pelo menos 3 caracteres"),
+    description: z.string().optional(),
+    date: z
+      .string()
+      .refine(
+        (date) => {
+          const selectedDate = new Date(date);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0); // Normaliza para garantir apenas a data
+          return selectedDate >= today;
+        },
+        { message: "A data deve ser hoje ou uma data futura" }
+      ),
+  });
+
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm({ resolver: zodResolver(taskSchema) });
+
 
   const loadTasks = async () => {
     try {
@@ -25,6 +54,7 @@ export default function Formulario({ navigation }) {
     }
   };
 
+
   const saveTasks = async (tasks) => {
     try {
       await AsyncStorage.setItem("tasks", JSON.stringify(tasks));
@@ -33,10 +63,11 @@ export default function Formulario({ navigation }) {
     }
   };
 
+
   const onSubmit = async (data) => {
     const newTask = {
       title: data.title,
-      description: data.description,
+      description: data.description || "",
       date: new Date(data.date).toLocaleDateString(),
     };
 
@@ -52,16 +83,9 @@ export default function Formulario({ navigation }) {
   };
 
   return (
-    <ImageBackground
-      source={require('../imagens/fundo.jpg')} // Certifique-se de que o caminho está correto
-      style={styles.background}
-      resizeMode="cover"
-    >
+    <ImageBackground source={require("../imagens/fundo.jpg")} style={styles.background} resizeMode="cover">
       <View style={styles.container}>
-        <Image
-          source={require('../imagens/imageTarefas.png')} // Substitua com o caminho da sua imagem
-          style={styles.logo}
-        />
+        {/* <Image source={require("../imagens/imageTarefas.png")} style={styles.logo} /> */}
 
         <Text style={styles.title}>REGISTRO DE TAREFAS</Text>
 
@@ -69,9 +93,11 @@ export default function Formulario({ navigation }) {
         <Controller
           control={control}
           name="title"
-          rules={{ required: "O título é obrigatório" }}
           render={({ field: { onChange, value } }) => (
-            <TextInput style={styles.input} placeholder="Digite o título" onChangeText={onChange} value={value} />
+            <>
+              <TextInput style={styles.input} placeholder="Digite o título" onChangeText={onChange} value={value} />
+              {errors.title && <Text style={styles.error}>{errors.title.message}</Text>}
+            </>
           )}
         />
 
@@ -96,7 +122,7 @@ export default function Formulario({ navigation }) {
         <Controller
           control={control}
           name="date"
-          render={({ field: { onChange, value } }) => (
+          render={({ field: { value } }) => (
             <View>
               <Pressable onPress={() => setShow(true)}>
                 <TextInput
@@ -116,16 +142,19 @@ export default function Formulario({ navigation }) {
                     setShow(false);
                     if (selectedDate) {
                       setDate(selectedDate);
-                      onChange(selectedDate.toISOString());
+                      setValue("date", selectedDate.toISOString(), { shouldValidate: true });
                     }
                   }}
+                  minimumDate={new Date()} // Garante que apenas a data atual ou futura pode ser selecionada
                 />
               )}
+
+              {errors.date && <Text style={styles.error}>{errors.date.message}</Text>}
             </View>
           )}
         />
 
-        <Button title="Criar Tarefa" onPress={handleSubmit(onSubmit)} />
+        <Button color="#327485" title="Criar Tarefa" onPress={handleSubmit(onSubmit)} />
       </View>
     </ImageBackground>
   );
@@ -137,18 +166,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   logo: {
-    width: 200, // Ajuste o tamanho da imagem conforme necessário
-    height: 200,
+    width: 300,
+    height: 300,
     alignSelf: "center",
-    marginBottom: 20, // Espaço entre a imagem e o título
+    marginBottom: 5,
   },
   container: {
     padding: 20,
     margin: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.28)", // Leve transparência para melhor leitura
+    backgroundColor: "rgba(255, 255, 255, 0.51)",
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "#ccc",
+    borderWidth: 2,
+    borderColor: "#ffffff",
   },
   title: {
     fontSize: 18,
@@ -166,14 +195,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
-    padding: 10,
+    // padding: 10,
     marginTop: 5,
     marginBottom: 10,
     width: "100%",
   },
+  error: {
+    color: "red",
+    fontSize: 12,
+    marginTop: -8,
+    marginBottom: 10,
+  },
 });
-
-
-
-
-
