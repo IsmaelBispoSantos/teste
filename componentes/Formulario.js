@@ -65,6 +65,7 @@ export default function Formulario({ navigation }) {
 
 
   const onSubmit = async (data) => {
+    Alert.alert("Tarefa Criada");
     const newTask = {
       title: data.title,
       description: data.description || "",
@@ -191,15 +192,26 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   input: {
-    backgroundColor: "#F3F3F3",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    // padding: 10,
-    marginTop: 5,
-    marginBottom: 10,
+    backgroundColor: "#FFFFFF", // Fundo branco para destaque
+    borderWidth: 3,
+    borderColor: "#BBB", // Cor de borda mais visível
+    borderRadius: 10, // Bordas mais arredondadas para suavidade
+    paddingHorizontal: 14, // Mais espaçamento interno
+    paddingVertical: 12,
+    marginTop: 8,
+    marginBottom: 12,
     width: "100%",
+    
+    // Sombra para efeito 3D no iOS
+    shadowColor: "#000",  
+    shadowOffset: { width: 3, height: 3 },  
+    shadowOpacity: 0.2,  
+    shadowRadius: 5,  
+    
+    // Elevação no Android para efeito 3D
+    elevation: 5,  
   },
+  
   error: {
     color: "red",
     fontSize: 12,

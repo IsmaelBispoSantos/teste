@@ -18,9 +18,11 @@ function HomeScreen({ navigation }) {
       <View style={styles.container}>
         <TouchableOpacity onPress={() => navigation.navigate('InserirTarefa')} style={styles.button}>
           <Image source={require('./imagens/add.jpg')} style={styles.icon} />
+          <Text style={styles.texto}>INSERIR TAREFA</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('ListarTarefas')} style={styles.button}>
           <Image source={require('./imagens/list.jpg')} style={styles.icon} />
+          <Text style={styles.texto}>LISTAR TAREFA</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -31,7 +33,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'MENU DO APLICATIVO' }} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'REGISTRO DE TAREFAS' }} />
         <Stack.Screen name="InserirTarefa" component={Formulario} />
         <Stack.Screen name="ListarTarefas" component={ListaTarefa} />
       </Stack.Navigator>
@@ -45,9 +47,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   container: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 50,
+    // marginTop: 50,
     alignItems: "center",
 
   },
@@ -56,9 +58,16 @@ const styles = StyleSheet.create({
   },
   icon: {
     borderRadius: 12,
-    borderWidth: 2,
-    borderColor: "#ffffff",
-    width: 180,  // Ajuste o tamanho da imagem conforme necessário
+    borderWidth: 4,
+    borderColor: "#FFFFFF",
+    width: 180, 
     height: 180,
   },
+  texto: {
+    // justifyContent: 'center',
+    // alignItems: "center",
+    color: "#FFFFFF",
+    marginLeft:30
+  }
+
 });
