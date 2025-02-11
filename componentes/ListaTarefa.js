@@ -5,13 +5,17 @@ import {
   FlatList, 
   StyleSheet, 
   TouchableOpacity, 
-  ImageBackground 
+  ImageBackground, 
+  Modal
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { PieChart } from "react-native-chart-kit";
+import { Dimensions } from "react-native";
 
 export default function ListaTarefas() {
   const [tasks, setTasks] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     loadTasks();
@@ -43,12 +47,53 @@ export default function ListaTarefas() {
     await AsyncStorage.setItem("tasks", JSON.stringify(updatedTasks));
   };
 
+  const completedTasks = tasks.filter(task => task.isCompleted).length;
+  const pendingTasks = tasks.length - completedTasks;
+
+  const chartData = [
+    { name: "Concluídas", population: completedTasks, color: "#4CAF50", legendFontColor: "#000", legendFontSize: 15 },
+    { name: "Pendentes", population: pendingTasks, color: "#D32F2F", legendFontColor: "#000", legendFontSize: 15 },
+
+  ];
+  
+
   return (
     <ImageBackground 
       source={require("../imagens/fundo.jpg")} // Substitua pelo caminho correto da sua imagem
       style={styles.background}
-      resizeMode="cover" // Pode ser "cover", "contain" ou "stretch"
+      resizeMode="cover"
     >
+      <TouchableOpacity style={styles.graphButton} onPress={() => setModalVisible(true)}>
+        <Text style={styles.graphButtonText}>Ver Gráfico</Text>
+      </TouchableOpacity>
+
+      <Modal visible={modalVisible} animationType="slide" transparent>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <PieChart
+              data={chartData}
+              width={Dimensions.get("window").width - 40}
+              height={220}
+              chartConfig={{
+                backgroundColor: "#fff",
+                backgroundGradientFrom: "#fff",
+                backgroundGradientTo: "#fff",
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              }}
+              accessor="population"
+              backgroundColor="transparent"
+              paddingLeft="15"
+              absolute
+            />
+            <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Fechar Gráfico</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {tasks.length === 0 ? (
         <View style={styles.alertContainer}>
           <Ionicons name="alert-circle" size={50} color="white" />
@@ -87,10 +132,47 @@ export default function ListaTarefas() {
 
 const styles = StyleSheet.create({
   background: {
-    flex: 1, // Faz a imagem cobrir toda a tela
+    flex: 1,
     padding: 10,
     justifyContent: "center",
   },
+  graphButton: {
+    backgroundColor: "#6200EE",
+    padding: 10,
+    borderRadius: 8,
+    alignItems: "center",
+    margin: 10,
+  },
+  graphButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+
+  },
+  modalContent: {
+    backgroundColor: "rgba(255, 255, 255, 0.51)",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    width:350
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: "#327485",
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  
   alertContainer: {
     backgroundColor: "#D9A300",
     padding: 20,
